@@ -1,17 +1,17 @@
-DCOS HelloWorld Subcommand
+DCOS Kubernetes Subcommand
 ==========================
 Basic DCOS subcommand
 
 Setup
 -----
 #. Make sure you meet requirements for installing packages_
-#. Clone git repo for the dcos helloworld cli::
+#. Clone git repo for the dcos kubernetes cli::
 
-    git clone git@github.com:mesosphere/dcos-helloworld.git
+    git clone git@github.com:mesosphere/dcos-kubernetes.git
 
 #. Change directory to the repo directory::
 
-    cd dcos-helloworld
+    cd dcos-kubernetes
 
 #. Make sure that you have virtualenv installed. If not type::
 
@@ -26,14 +26,14 @@ Configure Environment and Run
 
 #. TODO: Talk about how to configure the root dcos cli
 
-#. :code:`source` the setup file to add the :code:`dcos-helloworld` command line interface to your
+#. :code:`source` the setup file to add the :code:`dcos-kubernetes` command line interface to your
    :code:`PATH`::
 
     source env/bin/activate
 
-#. Get started by calling the DCOS HelloWorld CLI's help::
+#. Get started by calling the DCOS Kubernetes CLI's help::
 
-    dcos helloworld help
+    dcos kubernetes --help
 
 Running Tests:
 --------------

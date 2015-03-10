@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Clean and recreate environment
-cd /dcos-helloworld
+cd /dcos-kubernetes
 make clean env
 
 # Activate the virtual environment so that we can run make

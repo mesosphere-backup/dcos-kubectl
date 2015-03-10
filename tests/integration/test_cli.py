@@ -3,16 +3,12 @@ from common import exec_command
 
 def test_help():
     returncode, stdout, stderr = exec_command(
-        ['dcos-helloworld', 'helloworld', '--help'])
+        ['dcos-kubernetes', 'kubernetes', '--help'])
 
     assert returncode == 0
-    assert stdout == b"""DCOS HelloWorld Example Subcommand
+    assert stdout == b"""DCOS Kubernetes Subcommand
 
 Usage:
-    dcos helloworld info
-
-Options:
-    --help           Show this screen
-    --version        Show version
+    dcos kubectl parameters...
 """
     assert stderr == b''

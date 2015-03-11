@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Clean and recreate environment
 cd /dcos-helloworld
 make clean env

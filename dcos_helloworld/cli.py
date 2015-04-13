@@ -1,7 +1,7 @@
 """DCOS HelloWorld Example Subcommand
 
 Usage:
-    dcos helloworld info
+    dcos helloworld --info
 
 Options:
     --help           Show this screen
@@ -16,7 +16,7 @@ def main():
         __doc__,
         version='dcos-marathon version {}'.format(constants.version))
 
-    if args['helloworld'] and args['info']:
+    if args['helloworld'] and args['--info']:
         print('Example of a DCOS subcommand')
     else:
         print(__doc__)

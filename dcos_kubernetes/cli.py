@@ -22,6 +22,13 @@ def kubectl_binary_path_and_url():
     else:
         return (None, None)
 
+def read_in_chunks(file_object, chunk_size=1024):
+    while True:
+        data = file_object.read(chunk_size)
+        if not data:
+            break
+        yield data
+
 def download_kubectl(url, kubectl_path):
     import tarfile
 
@@ -30,10 +37,10 @@ def download_kubectl(url, kubectl_path):
             # download tar.gz
             print "Download kubectl from " + url
             from clint.textui import progress
-            import requests
-            r = requests.get(url, stream=True)
-            total_length = int(r.headers.get("content-length"))
-            for chunk in progress.bar(r.iter_content(chunk_size=1024), expected_size=(total_length/1024) + 1):
+            import urllib2
+            f = urllib2.urlopen(url)
+            total_length = int(f.info().getheader("Content-Length"))
+            for chunk in progress.bar(read_in_chunks(f), expected_size=(total_length/1024) + 1):
                 if chunk:
                     os.write(fd, chunk)
 

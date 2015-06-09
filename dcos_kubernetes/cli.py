@@ -90,7 +90,7 @@ def main():
     import urlparse
     env = os.environ.copy()
     env['KUBERNETES_MASTER'] = urlparse.urljoin(docs_url, "service/kubernetes/api")
-    rc = call([kubectl_path] + args)
+    rc = call([kubectl_path] + args, env=env)
     sys.exit(rc)
 
 if __name__ == "__main__":

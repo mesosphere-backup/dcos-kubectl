@@ -40,7 +40,8 @@ def download_kubectl(url, kubectl_path):
             import urllib2
             f = urllib2.urlopen(url)
             total_length = int(f.info().getheader("Content-Length"))
-            for chunk in progress.bar(read_in_chunks(f), expected_size=(total_length/1024) + 1):
+            chunk_size = (total_length/1024) + 1
+            for chunk in progress.bar(read_in_chunks(f, chunk_size=chunk_size), expected_size=chunk_size):
                 if chunk:
                     os.write(fd, chunk)
 

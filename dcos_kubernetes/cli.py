@@ -88,8 +88,8 @@ def main():
 
     # get api url
     config = dcos.util.get_config()
-    docs_url = config.get('core.dcos_url', None)
-    if docs_url is None or docs_url == "":
+    dcos_url = config.get('core.dcos_url', None)
+    if dcos_url is None or dcos_url == "":
         print("Error: dcos core.dcos_url is not set")
         sys.exit(2)
 
@@ -97,7 +97,7 @@ def main():
     from subprocess import call
     import urlparse
     env = os.environ.copy()
-    env['KUBERNETES_MASTER'] = urlparse.urljoin(docs_url, "service/kubernetes/api")
+    env['KUBERNETES_MASTER'] = urlparse.urljoin(dcos_url, "service/kubernetes/api")
     rc = call([kubectl_path] + args, env=env)
     sys.exit(rc)
 

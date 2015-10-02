@@ -6,9 +6,5 @@ def test_help():
         ['dcos-kubernetes', 'kubernetes', '--help'])
 
     assert returncode == 0
-    assert stdout == b"""DCOS Kubernetes Subcommand
-
-Usage:
-    dcos kubectl parameters...
-"""
+    assert stdout.startswith("kubectl controls the Kubernetes cluster manager")
     assert stderr == b''

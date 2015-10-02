@@ -1,14 +1,15 @@
-import sys
 import os
-import platform
 import os.path
+import platform
+import sys
 
-import dcos.util
 import dcos.constants
+import dcos.util
 from dcos.subcommand import package_dir
 
-BASE_URL="https://github.com/mesosphere/kubernetes-mesos/releases/download/"
-KUBECTL_VERSION="v0.5.0"
+BASE_URL = "https://github.com/mesosphere/kubernetes-mesos/releases/download/"
+KUBECTL_VERSION = "v0.5.0"
+
 
 def kubectl_binary_path_and_url():
     data_dir = package_dir("kubernetes")
@@ -16,11 +17,14 @@ def kubectl_binary_path_and_url():
     system, node, release, version, machine, processor = platform.uname()
 
     if system == "Darwin":
-        return (base + "_darwin", BASE_URL + KUBECTL_VERSION + "/kubectl-" + KUBECTL_VERSION + "-darwin-amd64.tgz")
+        return (base + "_darwin", BASE_URL + KUBECTL_VERSION + "/kubectl-" +
+                KUBECTL_VERSION + "-darwin-amd64.tgz")
     elif system == "Linux":
-        return (base + "_linux", BASE_URL + KUBECTL_VERSION + "/kubectl-" + KUBECTL_VERSION + "-linux-amd64.tgz")
+        return (base + "_linux", BASE_URL + KUBECTL_VERSION + "/kubectl-" +
+                KUBECTL_VERSION + "-linux-amd64.tgz")
     else:
         return (None, None)
+
 
 def read_in_chunks(file_object, chunk_size=1024):
     while True:
@@ -28,6 +32,7 @@ def read_in_chunks(file_object, chunk_size=1024):
         if not data:
             break
         yield data
+
 
 def download_kubectl(url, kubectl_path):
     import tarfile
@@ -41,7 +46,8 @@ def download_kubectl(url, kubectl_path):
             f = urllib2.urlopen(url)
             total_length = int(f.info().getheader("Content-Length"))
             chunk_num = int(total_length/1024) + 1
-            for chunk in progress.bar(read_in_chunks(f, chunk_size=1024), expected_size=chunk_num):
+            chunks = read_in_chunks(f, chunk_size=1024)
+            for chunk in progress.bar(chunks, expected_size=chunk_num):
                 if chunk:
                     os.write(fd, chunk)
 
@@ -65,6 +71,7 @@ def download_kubectl(url, kubectl_path):
         except Exception, e:
             print "Error while downloading kubectl binary: " + str(e)
             sys.exit(2)
+
 
 def main():
     # skip "kubernetes" command
@@ -99,10 +106,13 @@ def main():
     from subprocess import call
     import urlparse
     env = os.environ.copy()
-    env['KUBERNETES_MASTER'] = urlparse.urljoin(dcos_url, "service/kubernetes/api")
+    master = urlparse.urljoin(dcos_url, "service/kubernetes/api")
+    env['KUBERNETES_MASTER'] = master
     rc = call([kubectl_path] + args, env=env)
     sys.exit(rc)
 
+
 if __name__ == "__main__":
-    os.environ[dcos.constants.DCOS_CONFIG_ENV] = os.path.join(os.getenv("HOME"), dcos.constants.DCOS_DIR, "dcos.toml")
+    cfg = os.path.join(os.getenv("HOME"), dcos.constants.DCOS_DIR, "dcos.toml")
+    os.environ[dcos.constants.DCOS_CONFIG_ENV] = cfg
     main()

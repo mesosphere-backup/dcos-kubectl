@@ -83,6 +83,8 @@ def main():
     if kubectl_path is None:
         print("Error: unsupported operating system")
         return 2
+    if not os.path.exists(os.path.dirname(kubectl_path)):
+        os.makedirs(os.path.dirname(kubectl_path))
     if not os.path.exists(kubectl_path):
         download_kubectl(kubectl_url, kubectl_path)
 

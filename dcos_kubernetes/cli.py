@@ -107,8 +107,9 @@ def main():
     import urlparse
     env = os.environ.copy()
     master = urlparse.urljoin(dcos_url, "service/kubernetes/api")
-    env['KUBERNETES_MASTER'] = master
-    rc = call([kubectl_path] + args, env=env)
+    if 'KUBERNETES_MASTER' in env:
+        del env['KUBERNETES_MASTER']
+    rc = call([kubectl_path, "--server=" + master] + args, env=env)
     sys.exit(rc)
 
 

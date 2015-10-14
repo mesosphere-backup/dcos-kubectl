@@ -7,24 +7,35 @@ import dcos.constants
 import dcos.util
 from dcos.subcommand import package_dir
 
-BASE_URL = "https://github.com/mesosphere/kubernetes-mesos/releases/download/"
-KUBECTL_VERSION = "v0.5.0"
+def kubectl_binary_path_and_url(master):
+    # get kubectl meta json
+    import requests, json
+    meta = requests.get(master + "/static/kubectl-meta.json")
+    meta_json = json.loads(meta)
 
+    # get url
+    system, node, release, version, machine, processor = platform.uname()
+    if system == "Linux":
+        os = "linux"
+    elif system == "Darwin":
+        os = "darwin"
+    elif system == "Windows":
+        os = "windows"
+    arch = "amd64" # we only support amd64 for the moment
+    key = os + "-" + arch
+    if key not in meta_json:
+        raise Exception("System type %1 not supported".format(key))
+    url = master + "/static/" + meta_json[key].file
+    hash = meta_json[key].sha256
 
-def kubectl_binary_path_and_url():
+    # create filename
     data_dir = package_dir("kubernetes")
     base = os.path.join(data_dir, "kubectl")
-    system, node, release, version, machine, processor = platform.uname()
+    file = base + "-" + hash
+    if system == "Windows":
+        file += ".exe"
 
-    if system == "Darwin":
-        return (base + "_darwin", BASE_URL + KUBECTL_VERSION + "/kubectl-" +
-                KUBECTL_VERSION + "-darwin-amd64.tgz")
-    elif system == "Linux":
-        return (base + "_linux", BASE_URL + KUBECTL_VERSION + "/kubectl-" +
-                KUBECTL_VERSION + "-linux-amd64.tgz")
-    else:
-        return (None, None)
-
+    return file, url
 
 def read_in_chunks(file_object, chunk_size=1024):
     while True:
@@ -85,8 +96,17 @@ def main():
         print("Deploy and manage pods on Kubernetes")
         sys.exit(0)
 
+    # get api url
+    config = dcos.util.get_config()
+    dcos_url = config.get('core.dcos_url', None)
+    if dcos_url is None or dcos_url == "":
+        print("Error: dcos core.dcos_url is not set")
+        sys.exit(2)
+
     # check whether kubectl binary exists and download if not
-    kubectl_path, kubectl_url = kubectl_binary_path_and_url()
+    import urlparse
+    master = urlparse.urljoin(dcos_url, "service/kubernetes")
+    kubectl_path, kubectl_url = kubectl_binary_path_and_url(master)
     if kubectl_path is None:
         print("Error: unsupported operating system")
         return 2
@@ -95,21 +115,12 @@ def main():
     if not os.path.exists(kubectl_path):
         download_kubectl(kubectl_url, kubectl_path)
 
-    # get api url
-    config = dcos.util.get_config()
-    dcos_url = config.get('core.dcos_url', None)
-    if dcos_url is None or dcos_url == "":
-        print("Error: dcos core.dcos_url is not set")
-        sys.exit(2)
-
     # call kubectl with parameters
     from subprocess import call
-    import urlparse
     env = os.environ.copy()
-    master = urlparse.urljoin(dcos_url, "service/kubernetes/api")
     if 'KUBERNETES_MASTER' in env:
         del env['KUBERNETES_MASTER']
-    rc = call([kubectl_path, "--server=" + master] + args, env=env)
+    rc = call([kubectl_path, "--server=" + master + "/api"] + args, env=env)
     sys.exit(rc)
 
 

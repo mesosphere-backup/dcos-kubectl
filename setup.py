@@ -99,6 +99,7 @@ setup(
     entry_points={
         'console_scripts': [
             'dcos-kubernetes=dcos_kubernetes.cli:main',
+            'dcos-kubectl=dcos_kubernetes.cli:main',
         ],
     },
 )

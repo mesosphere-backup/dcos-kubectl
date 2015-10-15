@@ -76,7 +76,7 @@ def download_kubectl(url, kubectl_path):
 
 def main():
     # skip "kubernetes" command
-    if len(sys.argv) > 1 and sys.argv[1] == "kubernetes":
+    if len(sys.argv) > 1 and sys.argv[1] in ["kubernetes", "kubectl"]:
         args = sys.argv[2:]
     else:
         args = sys.argv[1:]

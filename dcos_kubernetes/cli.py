@@ -60,7 +60,8 @@ def download_kubectl(url, kubectl_path):
                     os.write(fd, decompressor.decompress(chunk))
 
             # move binary at right spot and make executable
-            os.rename(file_path, kubectl_path)
+            import shutil
+            shutil.move(file_path, kubectl_path)
             if not kubectl_path.endswith(".exe"):
                 os.chmod(kubectl_path, 0755)
 

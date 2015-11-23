@@ -47,7 +47,7 @@ def download_kubectl(url, kubectl_path):
     with dcos.util.temptext() as (fd, file_path):
         try:
             # download bz2 file and decompress in time
-            print "Download kubectl from " + url
+            print("Download kubectl from " + url)
             from clint.textui import progress
             import urllib2, bz2
             f = urllib2.urlopen(url)
@@ -63,15 +63,15 @@ def download_kubectl(url, kubectl_path):
             import shutil
             shutil.move(file_path, kubectl_path)
             if not kubectl_path.endswith(".exe"):
-                os.chmod(kubectl_path, 0755)
+                os.chmod(kubectl_path, 0o755)
 
-        except tarfile.TarError, e:
+        except tarfile.TarError as e:
             os.unlink(kubectl_path)
-            print "Error while opening kubectl tar file: " + str(e)
+            print("Error while opening kubectl tar file: " + str(e))
             sys.exit(2)
 
-        except Exception, e:
-            print "Error while downloading kubectl binary: " + str(e)
+        except Exception as e:
+            print("Error while downloading kubectl binary: " + str(e))
             sys.exit(2)
 
 
@@ -95,15 +95,17 @@ def main():
         sys.exit(2)
 
     # check whether kubectl binary exists and download if not
-    import urlparse
-    master = urlparse.urljoin(dcos_url, "service/kubernetes")
+    try:
+       from urlparse import urljoin # python 2
+    except ImportError:
+        from urllib.parse import urljoin # python 3
+    master = urljoin(dcos_url, "service/kubernetes")
     try:
         kubectl_path, kubectl_url = kubectl_binary_path_and_url(master)
-    except Exception, e:
+    except Exception as e:
         print("Error: " + str(e))
         return 2
     if not os.path.exists(os.path.dirname(kubectl_path)):
-        print "create"
         os.makedirs(os.path.dirname(kubectl_path))
     if not os.path.exists(kubectl_path):
         download_kubectl(kubectl_url, kubectl_path)

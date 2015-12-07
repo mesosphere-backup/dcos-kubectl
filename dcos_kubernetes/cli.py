@@ -49,8 +49,16 @@ def download_kubectl(url, kubectl_path):
             # download bz2 file and decompress in time
             print("Download kubectl from " + url)
             from clint.textui import progress
-            import urllib2, bz2
-            f = urllib2.urlopen(url)
+
+            try:
+                # For Python 3.0 and later
+                from urllib.request import urlopen
+            except ImportError:
+                # Fall back to Python 2's urllib2
+                from urllib2 import urlopen
+            f = urlopen(url)
+
+            import bz2
             decompressor = bz2.BZ2Decompressor()
             total_length = int(f.info().getheader("Content-Length"))
             chunk_num = int(total_length/1024) + 1

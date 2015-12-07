@@ -6,5 +6,7 @@ def test_help():
         ['dcos-kubernetes', 'kubernetes', '--help'])
 
     assert returncode == 0
-    assert stdout.startswith("kubectl controls the Kubernetes cluster manager")
+
+    expected_first_line = b'kubectl controls the Kubernetes cluster manager'
+    assert stdout.startswith(expected_first_line)
     assert stderr == b''

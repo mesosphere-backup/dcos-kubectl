@@ -1,0 +1,7 @@
+[core]
+dcos_url = "http://127.0.0.1:8000/"
+reporting = true
+timeout = 5
+ssl_verify = "false"
+[package]
+sources = [ "https://github.com/mesosphere/multiverse/archive/release-1.1.zip", "https://github.com/mesosphere/universe/archive/version-1.x.zip",]

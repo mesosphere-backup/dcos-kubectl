@@ -1,0 +1,16 @@
+language: python
+matrix:
+  include:
+    - python: "2.7"
+    - python: "3.5"
+    - python: "3.5"
+      env: SYNTAX=true
+install:
+  - pip install pytest simple-server
+  - pip install -r requirements.txt
+script:
+  - if [ "$SYNTAX" == true ]; then exec tox -e syntax; fi
+  - (cd tests/fake-kubernetes; pyserve -p 8000) &
+  - while ! curl -q -s http://127.0.0.1:8000; do sleep 1; done
+  - mkdir -p ~/.dcos && cp tests/fake-kubernetes/dcos.toml ~/.dcos
+  - tox -e py$(sed 's/\.//g' <<<${TRAVIS_PYTHON_VERSION})-integration

@@ -2,7 +2,7 @@ alabaster==0.7.6
 args==0.1.0
 Babel==2.1.1
 clint==0.5.1
--e git+git@github.com:mesosphere/dcos-cli@0.2.0#egg=dcos-master
+-e git+https://github.com/mesosphere/dcos-cli.git@0.2.0#egg=dcos-master
 docutils==0.12
 futures==3.0.3
 gitdb==0.6.4

@@ -1,0 +1,5 @@
+{
+	"linux-amd64": {"file":"linux/kubectl", "sha256":"3ff7409652967b9989d7744e71f9c0494c5ae223c4b9eb622c473f68e1986fbd"},
+	"darwin-amd64": {"file":"darwin/kubectl", "sha256":"bb147031edea594bd652d4d1421d8a16618d335e0ac3935392d0a5a8ef4091dd"},
+	"windows-amd64": {"file":"windows/kubectl.exe", "sha256":"a8cd736c295c39b77d9c63e9bc3191dd15fedd113a2e71808f9e3c9afc6da0a3"}
+}

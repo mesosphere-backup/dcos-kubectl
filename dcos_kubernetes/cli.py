@@ -7,6 +7,7 @@ import dcos.constants
 import dcos.util
 from dcos.subcommand import package_dir
 
+
 def kubectl_binary_path_and_url(master):
     # get kubectl meta json
     import requests
@@ -14,25 +15,28 @@ def kubectl_binary_path_and_url(master):
     try:
         meta = requests.get(meta_url).json()
     except:
-        raise Exception("Cannot download kubectl meta information from {0}".format(meta_url))
+        raise Exception(
+            "Cannot download kubectl meta info from {0}".format(meta_url)
+        )
 
     # get url
     system, node, release, version, machine, processor = platform.uname()
-    arch = "amd64" # we only support amd64 for the moment
+    arch = "amd64"  # we only support amd64 for the moment
     key = system.lower() + "-" + arch
     if key not in meta:
         raise Exception("System type {0} not supported".format(key))
     url = master + "/static/" + meta[key]["file"] + ".bz2"
-    hash = meta[key]["sha256"]
+    sha256 = meta[key]["sha256"]
 
     # create filename
     data_dir = package_dir("kubernetes")
     base = os.path.join(data_dir, "kubectl")
-    file_path = base + "-" + hash
+    file_path = base + "-" + sha256
     if system == "Windows":
         file_path += ".exe"
 
     return file_path, url
+
 
 def read_in_chunks(file_object, chunk_size=1024):
     while True:
@@ -40,6 +44,7 @@ def read_in_chunks(file_object, chunk_size=1024):
         if not data:
             break
         yield data
+
 
 def download_kubectl(url, kubectl_path):
     import tarfile
@@ -67,7 +72,6 @@ def download_kubectl(url, kubectl_path):
             for chunk in progress.bar(chunks, expected_size=chunk_num):
                 if chunk:
                     temp_file.write(decompressor.decompress(chunk))
-
 
             # move binary at right spot and make executable
             temp_file.file.close()
@@ -111,9 +115,9 @@ def main():
 
     # check whether kubectl binary exists and download if not
     try:
-       from urlparse import urljoin # python 2
+        from urlparse import urljoin  # python 2
     except ImportError:
-        from urllib.parse import urljoin # python 3
+        from urllib.parse import urljoin  # python 3
     master = urljoin(dcos_url, "service/kubernetes")
     try:
         kubectl_path, kubectl_url = kubectl_binary_path_and_url(master)

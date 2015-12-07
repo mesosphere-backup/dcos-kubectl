@@ -43,8 +43,9 @@ def read_in_chunks(file_object, chunk_size=1024):
 
 def download_kubectl(url, kubectl_path):
     import tarfile
+    import tempfile
 
-    with dcos.util.temptext() as (fd, file_path):
+    with tempfile.NamedTemporaryFile(delete=False) as temp_file:
         try:
             # download bz2 file and decompress in time
             print("Download kubectl from " + url)
@@ -60,16 +61,18 @@ def download_kubectl(url, kubectl_path):
 
             import bz2
             decompressor = bz2.BZ2Decompressor()
-            total_length = int(f.info().getheader("Content-Length"))
+            total_length = int(f.info()["Content-Length"])
             chunk_num = int(total_length/1024) + 1
             chunks = read_in_chunks(f, chunk_size=1024)
             for chunk in progress.bar(chunks, expected_size=chunk_num):
                 if chunk:
-                    os.write(fd, decompressor.decompress(chunk))
+                    temp_file.write(decompressor.decompress(chunk))
+
 
             # move binary at right spot and make executable
+            temp_file.file.close()
             import shutil
-            shutil.move(file_path, kubectl_path)
+            shutil.move(temp_file.name, kubectl_path)
             if not kubectl_path.endswith(".exe"):
                 os.chmod(kubectl_path, 0o755)
 
@@ -81,6 +84,10 @@ def download_kubectl(url, kubectl_path):
         except Exception as e:
             print("Error while downloading kubectl binary: " + str(e))
             sys.exit(2)
+
+        finally:
+            if os.path.exists(temp_file.name):
+                os.unlink(temp_file.name)
 
 
 def main():

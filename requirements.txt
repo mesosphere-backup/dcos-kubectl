@@ -1,6 +1,31 @@
-clint
-requests
-sphinx
-tox
-wheel
--e git+git@github.com:mesosphere/dcos-cli#egg=dcos
+alabaster==0.7.6
+args==0.1.0
+Babel==2.1.1
+clint==0.5.1
+-e git+https://github.com/mesosphere/dcos-cli.git@0.2.0#egg=dcos-master
+docutils==0.12
+futures==3.0.3
+gitdb==0.6.4
+GitPython==1.0.1
+Jinja2==2.8
+jsonschema==2.4.0
+MarkupSafe==0.23
+pager==3.3
+pluggy==0.3.1
+portalocker==0.5.4
+prettytable==0.7.2
+py==1.4.30
+Pygments==2.0.2
+pypng==0.0.18
+pystache==0.5.4
+pytz==2015.7
+requests==2.8.1
+six==1.10.0
+smmap==0.9.0
+snowballstemmer==1.2.0
+Sphinx==1.3.1
+sphinx-rtd-theme==0.1.9
+toml==0.9.1
+tox==2.2.1
+virtualenv==13.1.2
+wheel==0.24.0

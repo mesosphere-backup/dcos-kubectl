@@ -29,7 +29,7 @@ def kubectl_binary_path_and_url(master):
     sha256 = meta[key]["sha256"]
 
     # create filename
-    data_dir = package_dir("kubernetes")
+    data_dir = package_dir("kubectl")
     base = os.path.join(data_dir, "kubectl")
     file_path = base + "-" + sha256
     if system == "Windows":
@@ -95,8 +95,8 @@ def download_kubectl(url, kubectl_path):
 
 
 def main():
-    # skip "kubernetes" command
-    if len(sys.argv) > 1 and sys.argv[1] in ["kubernetes", "kubectl"]:
+    # skip "kubectl" command
+    if len(sys.argv) > 1 and sys.argv[1] == "kubectl":
         args = sys.argv[2:]
     else:
         args = sys.argv[1:]

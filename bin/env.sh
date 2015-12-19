@@ -3,7 +3,7 @@
 BASEDIR=`dirname $0`/..
 
 if [ ! -d "$BASEDIR/env" ]; then
-    virtualenv -q $BASEDIR/env --prompt='(dcos-kubernetes) '
+    virtualenv -q $BASEDIR/env --prompt='(dcos-kubectl) '
     echo "Virtualenv created."
 
     source $BASEDIR/env/bin/activate

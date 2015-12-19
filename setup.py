@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 from codecs import open
 from os import path
 
-from dcos_kubernetes import constants
+from dcos_kubectl import constants
 
 
 here = path.abspath(path.dirname(__file__))
@@ -12,7 +12,7 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
     long_description = f.read()
 
 setup(
-    name='dcos-kubernetes',
+    name='dcos-kubectl',
 
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
@@ -23,7 +23,7 @@ setup(
     long_description=long_description,
 
     # The project's main homepage.
-    url='https://github.com/mesosphere/dcos-kubernetes',
+    url='https://github.com/mesosphere/dcos-kubectl',
 
     # Author details
     author='Mesosphere, Inc.',
@@ -99,8 +99,7 @@ setup(
     # pip to create the appropriate form of executable for the target platform.
     entry_points={
         'console_scripts': [
-            'dcos-kubernetes=dcos_kubernetes.cli:main',
-            'dcos-kubectl=dcos_kubernetes.cli:main',
+            'dcos-kubectl=dcos_kubectl.cli:main',
         ],
     },
 )

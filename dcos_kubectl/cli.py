@@ -137,9 +137,17 @@ def main():
     # call kubectl with parameters
     from subprocess import call
     env = os.environ.copy()
+
     if 'KUBERNETES_MASTER' in env:
         del env['KUBERNETES_MASTER']
-    rc = call([kubectl_path, "--server=" + master + "/api"] + args, env=env)
+
+    rc = call([
+        kubectl_path,
+        "--server=" + master + "/api",
+        "--insecure-skip-tls-verify=" + str(not verify_certs).lower(),
+        "--context=dcos-kubectl",  # to nil current context settings
+        "--username=dcos-kubectl"  # to avoid username prompt
+    ] + args, env=env)
     sys.exit(rc)
 
 

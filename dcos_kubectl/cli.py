@@ -117,6 +117,11 @@ def main():
     core_verify_ssl = config.get('core.ssl_verify', 'true')
     verify_certs = str(core_verify_ssl).lower() in ['true', 'yes', '1']
 
+    # silence warnings from requests.packages.urllib3.  See DCOS-1007.
+    if not verify_certs:
+        import requests.packages.urllib3
+        requests.packages.urllib3.disable_warnings()
+
     # check whether kubectl binary exists and download if not
     try:
         from urlparse import urljoin  # python 2

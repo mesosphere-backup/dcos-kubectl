@@ -8,12 +8,12 @@ import dcos.util
 from dcos.subcommand import package_dir
 
 
-def kubectl_binary_path_and_url(master):
+def kubectl_binary_path_and_url(master, verify=True):
     # get kubectl meta json
     import requests
     meta_url = master + "/static/kubectl-meta.json"
     try:
-        meta = requests.get(meta_url).json()
+        meta = requests.get(meta_url, verify=verify).json()
     except:
         raise Exception(
             "Cannot download kubectl meta info from {0}".format(meta_url)
@@ -113,6 +113,10 @@ def main():
         print("Error: dcos core.dcos_url is not set")
         sys.exit(2)
 
+    # check certificates?
+    core_verify_ssl = config.get('core.ssl_verify', 'true')
+    verify_certs = str(core_verify_ssl).lower() in ['true', 'yes', '1']
+
     # check whether kubectl binary exists and download if not
     try:
         from urlparse import urljoin  # python 2
@@ -120,7 +124,8 @@ def main():
         from urllib.parse import urljoin  # python 3
     master = urljoin(dcos_url, "service/kubernetes")
     try:
-        kubectl_path, kubectl_url = kubectl_binary_path_and_url(master)
+        kubectl_path, kubectl_url = \
+            kubectl_binary_path_and_url(master, verify=verify_certs)
     except Exception as e:
         print("Error: " + str(e))
         return 2

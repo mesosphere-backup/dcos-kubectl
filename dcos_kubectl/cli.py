@@ -148,7 +148,7 @@ def main():
 
     rc = call([
         kubectl_path,
-        "--server=" + master + "/api",
+        "--server=" + master,
         "--insecure-skip-tls-verify=" + str(not verify_certs).lower(),
         "--context=dcos-kubectl",  # to nil current context settings
         "--username=dcos-kubectl"  # to avoid username prompt

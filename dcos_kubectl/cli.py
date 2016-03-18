@@ -3,9 +3,7 @@ import os.path
 import platform
 import sys
 
-import dcos.constants
-import dcos.util
-from dcos.subcommand import package_dir
+from dcos import constants, util
 
 
 def kubectl_binary_path_and_url(master, verify=True):
@@ -20,7 +18,7 @@ def kubectl_binary_path_and_url(master, verify=True):
         )
 
     # get url
-    system, node, release, version, machine, processor = platform.uname()
+    system, _, _, _, _, _ = platform.uname()
     arch = "amd64"  # we only support amd64 for the moment
     key = system.lower() + "-" + arch
     if key not in meta:
@@ -29,13 +27,25 @@ def kubectl_binary_path_and_url(master, verify=True):
     sha256 = meta[key]["sha256"]
 
     # create filename
-    data_dir = package_dir("kubectl")
+    data_dir = _package_dir("kubectl")
     base = os.path.join(data_dir, "kubectl")
     file_path = base + "-" + sha256
     if system == "Windows":
         file_path += ".exe"
 
     return file_path, url
+
+
+def _dcos_dir(path):
+    return os.path.expanduser(os.path.join("~", constants.DCOS_DIR, path))
+
+
+def _subcommand_dir():
+    return _dcos_dir(constants.DCOS_SUBCOMMAND_SUBDIR)
+
+
+def _package_dir(name):
+    return os.path.join(_subcommand_dir(), name)
 
 
 def read_in_chunks(file_object, chunk_size=1024):
@@ -62,13 +72,13 @@ def download_kubectl(url, kubectl_path):
             except ImportError:
                 # Fall back to Python 2's urllib2
                 from urllib2 import urlopen
-            f = urlopen(url)
+            url_file = urlopen(url)
 
             import bz2
             decompressor = bz2.BZ2Decompressor()
-            total_length = int(f.info()["Content-Length"])
+            total_length = int(url_file.info()["Content-Length"])
             chunk_num = int(total_length/1024) + 1
-            chunks = read_in_chunks(f, chunk_size=1024)
+            chunks = read_in_chunks(url_file, chunk_size=1024)
             for chunk in progress.bar(chunks, expected_size=chunk_num):
                 if chunk:
                     temp_file.write(decompressor.decompress(chunk))
@@ -80,13 +90,13 @@ def download_kubectl(url, kubectl_path):
             if not kubectl_path.endswith(".exe"):
                 os.chmod(kubectl_path, 0o755)
 
-        except tarfile.TarError as e:
+        except tarfile.TarError as err:
             os.unlink(kubectl_path)
-            print("Error while opening kubectl tar file: " + str(e))
+            print("Error while opening kubectl tar file: " + str(err))
             sys.exit(2)
 
-        except Exception as e:
-            print("Error while downloading kubectl binary: " + str(e))
+        except Exception as err:
+            print("Error while downloading kubectl binary: " + str(err))
             sys.exit(2)
 
         finally:
@@ -95,7 +105,6 @@ def download_kubectl(url, kubectl_path):
 
 
 def main():
-    # skip "kubectl" command
     if len(sys.argv) > 1 and sys.argv[1] == "kubectl":
         args = sys.argv[2:]
     else:
@@ -107,7 +116,7 @@ def main():
         sys.exit(0)
 
     # get api url
-    config = dcos.util.get_config()
+    config = util.get_config()
     dcos_url = config.get('core.dcos_url', None)
     if dcos_url is None or dcos_url == "":
         print("Error: dcos core.dcos_url is not set")
@@ -131,8 +140,8 @@ def main():
     try:
         kubectl_path, kubectl_url = \
             kubectl_binary_path_and_url(master, verify=verify_certs)
-    except Exception as e:
-        print("Error: " + str(e))
+    except Exception as err:
+        print("Error: " + str(err))
         return 2
     if not os.path.exists(os.path.dirname(kubectl_path)):
         os.makedirs(os.path.dirname(kubectl_path))
@@ -146,17 +155,17 @@ def main():
     if 'KUBERNETES_MASTER' in env:
         del env['KUBERNETES_MASTER']
 
-    rc = call([
+    ret_code = call([
         kubectl_path,
         "--server=" + master,
         "--insecure-skip-tls-verify=" + str(not verify_certs).lower(),
         "--context=dcos-kubectl",  # to nil current context settings
         "--username=dcos-kubectl"  # to avoid username prompt
     ] + args, env=env)
-    sys.exit(rc)
+    sys.exit(ret_code)
 
 
 if __name__ == "__main__":
-    cfg = os.path.join(os.getenv("HOME"), dcos.constants.DCOS_DIR, "dcos.toml")
-    os.environ[dcos.constants.DCOS_CONFIG_ENV] = cfg
+    cfg = _dcos_dir("dcos.toml")
+    os.environ[constants.DCOS_CONFIG_ENV] = cfg
     main()
